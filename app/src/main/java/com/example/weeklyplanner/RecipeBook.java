@@ -22,6 +22,7 @@ public class RecipeBook extends AppCompatActivity {
     ArrayList<String> allRecipiesNewString;
     File savedRecipies;
     ListView recipe_list;
+    File newlyReceivedRecipies;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +67,9 @@ public class RecipeBook extends AppCompatActivity {
         //params.x=0;
         //params.y= -20;
         //getWindow().setAttributes(params);
-
+        recipe_list.setOnItemClickListener(new RecipeBookAdapter.OnItemAutoCompleteAdder());
         recipe_list.setAdapter(new RecipeBookAdapter(this, allRecipiesString, savedRecipies));
+
 
     }
 }

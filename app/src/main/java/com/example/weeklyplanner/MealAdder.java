@@ -37,8 +37,13 @@ public class MealAdder extends AppCompatActivity {
     boolean[] checkedDates;
     ArrayList<Integer> mSelectedDates;
     String name;
-    File saveInUseRecipies;
+    File savenewRecipies;
+    File recipiesToBeSentToRecipeBook;
     ArrayList<String> allRecipiesString;
+    String autocomplete;
+    String [] auto;
+    ArrayList<String> autoingred;
+    String[] ingr;
     @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +53,25 @@ public class MealAdder extends AppCompatActivity {
         ingredients_list = findViewById(R.id.ingredients_list);
         mEdit = findViewById(R.id.mealName);
         recipies = new ArrayList<String>();
+        auto = new String[2];
+        autoingred = MainScreen.initialise(autoingred);
         allRecipiesString = getIntent().getStringArrayListExtra("allRecipies");
+        autocomplete = getIntent().getStringExtra("autocompletion");
+        if(autocomplete!=null) {
+            auto= autocomplete.split(";");
+             ingr = auto[1].toString().split("<");
+             Log.i(String.valueOf(auto),"after splittage");
+           Log.i(String.valueOf(ingr),"ingredients that hsoiuld be added");
+            for(int i=0;i<ingr.length;i++){
+                autoingred.add(ingr[i]);
+            }
+            if(ingr.length == 0){
+                autoingred.add(auto[1]);
+            }
+        }
+        recipiesToBeSentToRecipeBook = new File(getApplicationContext().getFilesDir(),"things to sent to recipe book");
         allRecipiesString = MainScreen.initialise(allRecipiesString);
+        allRecipiesString.addAll((ArrayList<String>)MainScreen.initialise(ShoppingList.loadArray(recipiesToBeSentToRecipeBook)));
         mEdit.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         ingredientsForDayTemp = new ArrayList<>();
         dates = new String[7];
@@ -61,6 +83,13 @@ public class MealAdder extends AppCompatActivity {
         checkedDates = new boolean[dates.length];
         BottomNavigationView navView = findViewById(R.id.meal_adder_nav);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        if(autoingred!=null){
+            ingredientsForDayTemp.addAll(autoingred);
+
+        }
+        if(auto[0]!=null){
+            mEdit.setText(auto[0]);
+        }
         add_ingredient = (Button) findViewById(R.id.add_ingredientsBtn);
         add_ingredient.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,7 +135,8 @@ public class MealAdder extends AppCompatActivity {
                 case R.id.meal_cancel:
                     Intent i1= new Intent(MealAdder.this, MainScreen.class);
                     startActivity(i1);
-
+                    ShoppingList.saveArray(allRecipiesString,recipiesToBeSentToRecipeBook);
+                    break;
                 case R.id.meal_done:
                      name = ShoppingList.preferedCase(mEdit.getText().toString());
                     final AlertDialog.Builder builder = new AlertDialog.Builder(MealAdder.this);
@@ -155,11 +185,13 @@ public class MealAdder extends AppCompatActivity {
                     });
                     AlertDialog alertDialog = builder.create();
                     alertDialog.show();
+                    ShoppingList.saveArray(allRecipiesString,recipiesToBeSentToRecipeBook);
                     break;
                 case R.id.recipe_book:
                     Intent i4 = new Intent(MealAdder.this,RecipeBook.class);
                     Log.i(String.valueOf(allRecipiesString),"recipies sent from mealadder to Recipe");
                     i4.putExtra("allRecipiesForBook",allRecipiesString);
+                    ShoppingList.saveArray(new ArrayList<String>(),recipiesToBeSentToRecipeBook);
                     startActivity(i4);
                     break;
             }

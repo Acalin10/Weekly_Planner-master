@@ -43,7 +43,7 @@ public class Recipe {
         recipeString = getName() + ";";
         for(int k=0; k<getIngredients().size();k++){
             if(k>=0&&k<getIngredients().size()-1) {
-                recipeString = recipeString + getIngredients().get(k) + ".";
+                recipeString = recipeString + getIngredients().get(k) + "<";
             }else{recipeString = recipeString + getIngredients().get(k);}
         }
         recipeString = recipeString + ";" +getDay();
@@ -53,7 +53,7 @@ public class Recipe {
 
         String[] parts = string.split(";");
         ArrayList<String> ingredients = new ArrayList<>();
-        String[] ingr = parts[1].split(".");
+        String[] ingr = parts[1].split("<");
         for(int i=0;i<ingr.length;i++){
             ingredients.add(ingr[i]);
         }
